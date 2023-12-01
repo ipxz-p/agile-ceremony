@@ -1,20 +1,25 @@
 "use client"
-import { validateEmail, validatePassword } from "@/lib/validations/validateAuthForm";
+import { validateEmail, validatePassword, validateUsername } from "@/lib/validations/validateAuthForm";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { FormEvent, useState } from "react";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { z } from "zod";
-import { signIn } from "next-auth/react";
-import { Margin } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-const LoginForm = () => {
+import { register } from "@/lib/actions/user.action";
+const RegisterForm = () => {
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState<string | undefined>(undefined);
+    const [username, setUsername] = useState("")
+    const [usernameError, setUsernameError] = useState<string | undefined>(undefined);
     const [password, setPassword] = useState("");
     const [passwordError, setPasswordError] = useState<string | undefined>(undefined)
     const [showPassword, setShowPassword] = useState(false);
+    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const UsernameValue = e.target.value
+        setUsernameError(validateUsername(UsernameValue));
+        setUsername(UsernameValue);
+    }
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const emailValue = e.target.value
         setEmailError(validateEmail(emailValue));
@@ -32,26 +37,29 @@ const LoginForm = () => {
     const router = useRouter();
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const credentials = {
-            email: formData.get("email") as string,
-            password: formData.get("password") as string,
-        };
-        const res = await signIn('credentials', {
-            redirect: false, // or provide your redirect options
-            ...credentials,
-        });
-        // Handle the response as needed
-        if (!res?.error) {
-            router.push('/');
-            router.refresh();
-        }else{
-            alert("Email or password incorrect")
+        try {
+            await register(username, email, password);
+            router.push('/login');
+        } catch (error) {
+            alert(error);
         }
     }
     return (
         <form onSubmit={handleSubmit} className="flex-shrink-0 w-[400px] flex flex-col justify-center items-center h-screen px-8">
-            <p className="text-2xl font-medium mb-6">Login to your account</p>
+            <p className="text-2xl font-medium mb-6">Create your account</p>
+            <TextField
+                className="w-full"
+                id="outlined-basic"
+                label="Username"
+                variant="outlined"
+                size="small"
+                onChange={handleUsernameChange}
+                error={!!usernameError}
+                helperText={usernameError}
+                required
+                name="username"
+                
+            />
             <TextField
                 className="w-full"
                 id="outlined-basic"
@@ -63,6 +71,9 @@ const LoginForm = () => {
                 helperText={emailError}
                 required
                 name="email"
+                sx={{
+                    marginTop: 2
+                }}
             />
             <TextField
                 className="w-full"
@@ -105,11 +116,11 @@ const LoginForm = () => {
                 Login
             </Button>
             <div className="flex">
-                <p>Don't Have an Account?</p>
-                <Link className="ml-2 text-myblue-600" href="/register">Register</Link>
+                <p>Have an account?</p>
+                <Link className="ml-2 text-myblue-600" href="/login">Log in</Link>
             </div>
         </form>
     );
 }
 
-export default LoginForm;
+export default RegisterForm;

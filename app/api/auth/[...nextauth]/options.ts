@@ -1,5 +1,9 @@
+import bcrypt from "bcrypt"
+import User from "@/lib/models/user.model";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { login } from "@/lib/actions/user.action";
+
 export const option: NextAuthOptions = {
     pages: {
         signIn: '/login'
@@ -12,13 +16,10 @@ export const option: NextAuthOptions = {
                 password: {},
             },
             async authorize(credentials, req) {
-                const user = { id: "42", email: "ipxz@gmail.com", password: "123456", role: "manager" }
-                if (credentials?.email === user.email && credentials?.password === user.password) {
-                    console.log("suc");
-                    
+                try {
+                    const user = await login(credentials?.email, credentials?.password)
                     return user
-                } else {
-                    console.log("failed");
+                } catch (error) {
                     return null
                 }
             },
@@ -26,12 +27,12 @@ export const option: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user }) {
-            if(user) token.role = user.role
+            if (user) token.role = user.role
             return token
         },
-        async session({ session, token }){
-            if(session?.user) session.user.role = token.role
+        async session({ session, token }) {
+            if (session?.user) session.user.role = token.role
             return session
-        }
+        },
     }
 }
