@@ -1,10 +1,11 @@
 import { option } from "@/app/api/auth/[...nextauth]/options";
 import { cn } from "@/lib/utils";
+import { Logout } from "@mui/icons-material";
 import { getServerSession } from "next-auth";
 import { Gloria_Hallelujah } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import Logout from "./logout";
+
 const gloria = Gloria_Hallelujah({ 
     subsets: ['latin'],
     weight: '400'
