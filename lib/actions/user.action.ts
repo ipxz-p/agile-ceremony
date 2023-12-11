@@ -11,7 +11,7 @@ export const register = async (
 ) => {
     try {
         await connectDB()
-        const hashPassword = await bcrypt.hash(password, 10);
+        const hashaPssword = await bcrypt.hash(password, 10);
         await User.create({
             username,
             email,

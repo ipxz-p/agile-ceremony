@@ -9,11 +9,11 @@ import Link from "next/link";
 import { register } from "@/lib/actions/user.action";
 const RegisterForm = () => {
     const [email, setEmail] = useState("");
-    const [emailError, setEmailError] = useState<string | undefined>(undefined);
+    const [emailError, setEmailError] = useState<string[] | undefined>(undefined);
     const [username, setUsername] = useState("")
-    const [usernameError, setUsernameError] = useState<string | undefined>(undefined);
+    const [usernameError, setUsernameError] = useState<string[] | undefined>(undefined);
     const [password, setPassword] = useState("");
-    const [passwordError, setPasswordError] = useState<string | undefined>(undefined)
+    const [passwordError, setPasswordError] = useState<string[] | undefined>(undefined)
     const [showPassword, setShowPassword] = useState(false);
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const UsernameValue = e.target.value
@@ -33,7 +33,7 @@ const RegisterForm = () => {
     const handleTogglePasswordVisibility = () => {
         setShowPassword((prevShowPassword) => !prevShowPassword);
     };
-    let isFormValid = !emailError && !passwordError;
+    let isFormValid = !emailError && !passwordError && username !== "" && email !== "" && password !== "";
     const router = useRouter();
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -83,7 +83,10 @@ const RegisterForm = () => {
                 size="small"
                 onChange={handlePasswordChange}
                 error={!!passwordError}
-                helperText={passwordError}
+                helperText={
+                    passwordError && 
+                    passwordError?.map((error, index) => <div key={index}>{error}</div>)
+                }
                 required
                 type={showPassword ? 'text' : 'password'}
                 InputProps={{
@@ -110,7 +113,11 @@ const RegisterForm = () => {
                     marginBottom: 3,
                     paddingX: 3,
                     backgroundColor: isFormValid ? "#00B4D8 !important" : undefined,
-                    alignSelf: 'flex-end'
+                    alignSelf: 'flex-end',
+                    "&:disabled": {
+                        cursor: "not-allowed",
+                        pointerEvents: "all !important",
+                    },
                 }}
             >
                 Login
