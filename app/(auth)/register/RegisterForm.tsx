@@ -1,7 +1,7 @@
 "use client"
 import { validateEmail, validatePassword, validateUsername } from "@/lib/validations/validateAuthForm";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useRouter } from "next/navigation";
@@ -37,15 +37,14 @@ const RegisterForm = () => {
     const router = useRouter();
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        try {
-            await register(username, email, password);
-            router.push('/login');
-        } catch (error) {
-            alert(error);
+        let res = await register(username, email, password);
+        if(!res?.success){
+            return alert(res?.message)
         }
+        router.push('/login');
     }
     return (
-        <form onSubmit={handleSubmit} className="flex-shrink-0 w-[400px] flex flex-col justify-center items-center h-screen px-8">
+        <form onSubmit={handleSubmit} className="flex-shrink-0 w-screen lg:w-[400px] flex flex-col justify-center items-center h-screen px-8">
             <p className="text-2xl font-medium mb-6">Create your account</p>
             <TextField
                 className="w-full"
@@ -85,7 +84,7 @@ const RegisterForm = () => {
                 error={!!passwordError}
                 helperText={
                     passwordError && 
-                    passwordError?.map((error, index) => <div key={index}>{error}</div>)
+                    passwordError?.map((error, index) => <React.Fragment key={index}>{error}</React.Fragment>)
                 }
                 required
                 type={showPassword ? 'text' : 'password'}
@@ -120,7 +119,7 @@ const RegisterForm = () => {
                     },
                 }}
             >
-                Login
+                register
             </Button>
             <div className="flex">
                 <p>Have an account?</p>

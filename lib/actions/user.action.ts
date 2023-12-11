@@ -11,16 +11,20 @@ export const register = async (
 ) => {
     try {
         await connectDB()
-        const hashaPssword = await bcrypt.hash(password, 10);
+        const hashPassword = await bcrypt.hash(password, 10);
+        const user = await User.findOne({email}).exec()
+        if(user){
+            return { success: false, message: "Email already exists" };
+        }
         await User.create({
             username,
             email,
             password: hashPassword,
             role: ["member"]
         })
+        return { success: true, message: "Registration successful" };
     } catch (error: any) {
-        console.log(error);
-        throw error;
+        return { success: false, message: error };
     }
 }
 
@@ -40,8 +44,6 @@ export const login = async (
         }
         return user
     } catch (error: any) {
-        console.log(error);
         throw error;
     }
-
 }

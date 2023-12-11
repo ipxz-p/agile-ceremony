@@ -50,7 +50,8 @@ const LoginForm = () => {
         }
     }
     return (
-        <form onSubmit={handleSubmit} className="flex-shrink-0 w-[400px] flex flex-col justify-center items-center h-screen px-8">
+        <form onSubmit={handleSubmit} 
+        className="flex-shrink-0 w-screen lg:w-[400px] flex flex-col justify-center items-center h-screen px-8">
             <p className="text-2xl font-medium mb-6">Login to your account</p>
             <TextField
                 className="w-full"
